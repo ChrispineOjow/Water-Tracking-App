@@ -57,7 +57,7 @@ export const createReport = async(req, res)=>{
 
 
 //Update water report
-export const updateWaterReport = async (req, res) => {
+export const updateReport = async (req, res) => {
     try{
 
         const {_id} = req.params;
@@ -141,7 +141,7 @@ export const getReportById = async(req, res)=>{
 
 };
 
-export const deleteWaterReport = async(req, res)=>{
+export const deleteReport = async(req, res)=>{
     try{
 
         const {_id} = req.params;
