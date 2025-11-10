@@ -14,4 +14,4 @@ const userSchema = new mongoose.Schema({
 //Creating a geospatial index for location based queries
 userSchema.index({location:'2dsphere'});
 
-export const user = mongoose.model("User",userSchema);
+export const User = mongoose.model("User",userSchema);

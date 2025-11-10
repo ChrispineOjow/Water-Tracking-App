@@ -6,6 +6,9 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
+//Middlewares
+app.use(express.json())
+
 //Database connection
 await connectDB();
 
