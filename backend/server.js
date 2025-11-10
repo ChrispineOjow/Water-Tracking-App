@@ -29,9 +29,9 @@ app.post('/api/test/create-user', async(req,res)=>{
     try{
 
         const testUser = new User({
-            clerkId: 'test_clerk_123',
-            name: 'Test User',
-            email: 'test@example.com',
+            clerkId: 'test_clerk_543',
+            name: 'John Doe',
+            email: 'johndoe@example.com',
             location: {
                 type: 'Point',
                 coordinates: [36.8219, -1.2921] 

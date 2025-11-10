@@ -10,7 +10,6 @@ export const createReport = async(req, res)=>{
         //Coordinate validation
         if(!coordinates || coordinates.length !== 2){
             return res.status(400).json({
-                success: false,
                 message: "Valid coordinates [longitude, latitude] are required"
             });
         };
@@ -20,7 +19,6 @@ export const createReport = async(req, res)=>{
 
         if(!user){
             return res.status(400).json({
-                success: false,
                 message: "User not found"
             });
         };
@@ -41,9 +39,8 @@ export const createReport = async(req, res)=>{
         const savedReport = await newReport.save();
 
         res.status(201).json({
-            success:true,
             message:"Water report created successfully",
-            data:savedReport
+            savedReport
         });
 
 
@@ -51,8 +48,45 @@ export const createReport = async(req, res)=>{
 
         console.error("Error creating report", error);
         res.status(500).json({
-            success:false,
             message:"Server error",
+            error:error.message
+        });
+
+    };
+};
+
+
+//Update water report
+export const updateWaterReport = async (req, res) => {
+    try{
+
+        const {_id} = req.params;
+        const updatedReport = await WaterReport.findByIdAndUpdate(
+            _id,
+            req.body,
+            {
+                new:true,
+                runValidators:true
+            }
+        ).populate("userId", "name email location -_id");
+
+        if(!updatedReport){
+            res.status(404).json({
+                message:"The report was not found"
+            });
+        }
+        
+        res.status(200).json({
+            message:"Report successfully updated",
+            data:updatedReport
+        })
+
+        
+    }catch(error){
+
+        console.error(`Server error ${error}`);
+        return res.status(500).json({
+            message:"Server error just occured",
             error:error.message
         });
 
@@ -66,16 +100,14 @@ export const getAllReports = async (req, res)=>{
         const reports = await WaterReport.find().populate('userId','name email location').sort({timestamp:-1})
 
         res.status(200).json({
-            success:true,
             count:reports.length,
-            data:reports
+            reports
         });
 
     }catch(error){
 
         console.error("Error fetching reports",error);
         res.status(500).json({
-            success:false,
             message: "Server Error",
             error: error.message
         });
@@ -87,25 +119,20 @@ export const getAllReports = async (req, res)=>{
 export const getReportById = async(req, res)=>{
     try{
         const {_id}=req.params;
-        const report = await WaterReport.findById(_id).populate("userId","name email location");
+        const report = await WaterReport.findById(_id).populate("userId","name email location -_id");
 
         if(!report){
             return res.status(401).json({
-                success:false,
                 message: "The Report could Not be found"
             });
         }
 
-        res.status(200).json({
-            success:true,
-            data:report
-        });
+        res.status(200).json({report});
 
     }catch(error){
 
         console.error("Error fetching report", error);
         res.status(500).json({
-            success:false,
             message:"Server error",
             error: error.message
 
@@ -113,3 +140,30 @@ export const getReportById = async(req, res)=>{
     }
 
 };
+
+export const deleteWaterReport = async(req, res)=>{
+    try{
+
+        const {_id} = req.params;
+        const deleteWaterReport = await WaterReport.findByIdAndDelete(_id);
+
+        if(!deleteWaterReport){
+            return res.status(404).json({
+                message:"The Record could not be found"
+            })
+        }
+
+        res.status(200).json({
+            message:"Report deleted successfully"
+        })
+
+    }catch(error){
+
+        console.error("Server error", error);
+        return res.status(500).json({
+            message:"Server error",
+            error: error.message
+        })
+
+    }
+}

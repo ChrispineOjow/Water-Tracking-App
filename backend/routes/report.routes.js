@@ -1,5 +1,5 @@
 import express from "express";
-import{createReport, getAllReports, getReportById} from "../controllers/Report.controller.js"
+import{createReport, getAllReports, getReportById, updateWaterReport, deleteWaterReport} from "../controllers/Report.controller.js"
 
 const reportRouter = express.Router();
 
@@ -10,7 +10,13 @@ reportRouter.post("/reports", createReport);
 reportRouter.get("/reports", getAllReports);
 
 //Get reports by Id
-reportRouter.get("/reports", getReportById);
+reportRouter.get("/reports/:_id", getReportById);
+
+//Update the Water report
+reportRouter.put("/reports/:_id", updateWaterReport);
+
+//Delete the Water report
+reportRouter.delete("/reports/:_id", deleteWaterReport);
 
 
 export default reportRouter;
