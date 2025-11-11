@@ -31,8 +31,6 @@ This application serves as a platform for crowdsourcing water data, which can be
 - **Node.js** with **Express.js** - Server framework
 - **MongoDB** with **Mongoose** - Database and ODM
 - **Clerk** - Authentication and user management
-- **JWT** (JSON Web Tokens) - Token-based authentication
-- **bcryptjs** - Password hashing
 - **CORS** - Cross-origin resource sharing
 
 ### Database
@@ -128,7 +126,6 @@ POST /api/reports
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
    CLERK_SECRET_KEY=your_clerk_secret_key
-   JWT_SECRET=your_jwt_secret_key
    ```
 
 5. **Start the development server**
