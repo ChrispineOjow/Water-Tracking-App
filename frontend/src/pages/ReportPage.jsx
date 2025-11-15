@@ -1,9 +1,17 @@
 import { Button } from "../components/ui/button";
 import  ReportCard  from "../components/ReportCard";
+import { useNavigate } from "react-router-dom";
 
 
 
 function ReportPage(){
+
+    const navigate = useNavigate();
+
+    const handleAddReport = () => {
+        navigate("/addReport");
+    }
+
     return(
         <>
         
@@ -11,7 +19,7 @@ function ReportPage(){
 
                 <div className="flex m-5 justify-between items-center">
                     <h3 className="font-bold  text-3xl space-x-2">Water Reports</h3>
-                    <Button className="space-x-7 p-6 bg-black text-white hover:cursor-pointer">
+                    <Button className="space-x-7 p-6 bg-black text-white hover:cursor-pointer" onClick={handleAddReport}>
                         Add New Report
                     </Button>
                 </div>

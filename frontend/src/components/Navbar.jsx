@@ -42,7 +42,7 @@ function Navbar(){
 
                             <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
                                 <NavigationMenuLink asChild>
-                                    <Link to="/">Add Report</Link>
+                                    <Link to="/addReport">Add Report</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
                             

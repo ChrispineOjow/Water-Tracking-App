@@ -13,6 +13,10 @@ function HomePage(){
         navigate("/reports");
     }
 
+    const handleAddReport = () =>{
+        navigate("/addReport");
+    }
+
     return(
         <>
 
@@ -22,7 +26,7 @@ function HomePage(){
                 <h2 className="mt-15 font-semibold text-2xl">Track water availability and quality in your area</h2>
 
                 <div className="mt-10">
-                    <Button className="bg-black text-white m-5 hover:cursor-pointer h-10">Add Water Report</Button>
+                    <Button className="bg-black text-white m-5 hover:cursor-pointer h-10" onClick={handleAddReport}>Add Water Report</Button>
                     <Button className="bg-black text-white m-5 hover:cursor-pointer h-10" onClick={handleViewReports}>View Reports</Button>
                 </div>
             </div>
