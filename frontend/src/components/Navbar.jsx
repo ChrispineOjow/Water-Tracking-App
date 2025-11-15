@@ -7,12 +7,12 @@ import { useState } from "react";
 
 
 function Navbar(){
-    const [open, setOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
     return(
         <>
             <div className=" flex sticky top-0 z-50">
-                <nav className="p-3 border-b  w-full bg-black text-white text-2xl  flex  justify-between hover:bg-white-700 hover:text-black-700" >
+                <nav className="p-3 border-black w-full bg-black text-white text-2xl  flex  justify-between hover:bg-white-700 hover:text-black-700" >
                     <div className="flex items-center space-x-2">
                         <Link to="/" className="flex items-center">
 
@@ -36,7 +36,7 @@ function Navbar(){
 
                             <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
                                 <NavigationMenuLink asChild>
-                                <Link to="/">Reports</Link>
+                                <Link to="/reports">Reports</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
 
@@ -53,17 +53,17 @@ function Navbar(){
 
                     {/* Mobile Hamburger menu */}
 
-                    <div className="md:hidden flex items-center">
+                    <div className="md:hidden flex items-center text-white">
                         <Drawer direction="right">
                             <DrawerTrigger asChild>
-                                <Button onClick={() => setOpen(true)} variant="ghost" size="icon" className="text-white">
+                                <Button onClick={() => isOpen ? setIsOpen(false) : setIsOpen(true) } variant="ghost" size="icon" className="text-white">
 
                                     <Menu className="h-6 w-6"/>
 
                                 </Button>
                             </DrawerTrigger>
 
-                            <DrawerContent side="top" className="w-[200px] sm:w-[250px] flex flex-col pt-12" >
+                            <DrawerContent side="top" className="bg-black text-white w-[200px] sm:w-[250px] flex flex-col pt-12" >
 
                                 <DrawerHeader> {/* Optional: Use SheetHeader for correct spacing */}
                                     <DrawerTitle/>
