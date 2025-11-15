@@ -20,4 +20,6 @@ const waterReportSchema = new mongoose.Schema({
 // Geospatial index for "find reports near me" queries
 waterReportSchema.index({location:'2dsphere'});
 
-export const WaterReport =mongoose.model('WaterReport', waterReportSchema); 
+const WaterReport =mongoose.model('WaterReport', waterReportSchema); 
+
+export default WaterReport

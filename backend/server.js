@@ -2,7 +2,8 @@ import {connectDB} from "./config/db.js";
 import "dotenv/config";
 import express from "express";
 import reportRouter from "./routes/report.routes.js";
-import {User } from "./models/User.model.js"; // Will remove this its just for testing the user by derectly inserting the user to the server.js file
+import userRouter from "./routes/user.route.js"
+
 
 
 const app = express();
@@ -23,38 +24,8 @@ app.get("/", async(req, res)=>{
 });
 
 
-//This is temporary and it will be removed after test
-app.post('/api/test/create-user', async(req,res)=>{
-
-    try{
-
-        const testUser = new User({
-            clerkId: 'test_clerk_543',
-            name: 'John Doe',
-            email: 'johndoe@example.com',
-            location: {
-                type: 'Point',
-                coordinates: [36.8219, -1.2921] 
-            },
-            role: 'user'
-        })
-
-        const saved = await testUser.save();
-        res.json({
-            success:true,
-            data:saved
-        })
-
-    }catch(error){
-
-        res.status(500).json({error:error.message});
-
-    }
-
-})
-
-
 app.use('/api', reportRouter);
+app.use('/api',userRouter);
 
 
 //Listen to the PORT

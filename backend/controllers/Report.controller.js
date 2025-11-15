@@ -1,14 +1,15 @@
-import {WaterReport} from "../models/WaterReport.model.js";
-import {User} from "../models/User.model.js";
+import WaterReport from "../models/WaterReport.model.js";
+import User from "../models/User.model.js";
 
 //Create a water report
 export const createReport = async(req, res)=>{
     try{
 
-        const {userId, coordinates, waterAvailable, waterClean, description} = req.body
+        const {userId, location, waterAvailable, waterClean, description} = req.body
+        const coordinates = location.coordinates
 
         //Coordinate validation
-        if(!coordinates || coordinates.length !== 2){
+        if(!coordinates || !Array.isArray(coordinates) ||coordinates.length !== 2){
             return res.status(400).json({
                 message: "Valid coordinates [longitude, latitude] are required"
             });
