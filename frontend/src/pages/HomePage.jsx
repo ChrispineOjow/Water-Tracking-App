@@ -14,7 +14,7 @@ function HomePage(){
     }
 
     const handleAddReport = () =>{
-        navigate("/addReport");
+        navigate("/addReports");
     }
 
     return(

@@ -42,7 +42,13 @@ function Navbar(){
 
                             <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
                                 <NavigationMenuLink asChild>
-                                    <Link to="/addReport">Add Report</Link>
+                                <Link to="/addReports">Add Reports</Link>
+                                </NavigationMenuLink>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
+                                <NavigationMenuLink asChild>
+                                    <Link to="/setting">Settings</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
                             
@@ -71,8 +77,9 @@ function Navbar(){
                                 </DrawerHeader>
 
                                 <Link to="/" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Home</Link>
-                                <Link to="/" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Reports</Link>
-                                <Link to="/" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Add Report</Link>
+                                <Link to="/reports" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Reports</Link>
+                                <Link to="/addReports" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Add Reports</Link>
+                                <Link to="/setting" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Settings</Link>
 
                             </DrawerContent>
                         </Drawer>

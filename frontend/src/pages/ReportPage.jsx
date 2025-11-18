@@ -1,17 +1,109 @@
 import { Button } from "../components/ui/button";
 import  ReportCard  from "../components/ReportCard";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from 'react';
+import { reportsAPI } from '../lib/api';
 
 
+
+const REPORTS_PER_PAGE = 5;
 
 function ReportPage(){
 
+    const [reports, setReports] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [filter, setFilter] = useState('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [deletingId, setDeletingId] = useState(null);
     const navigate = useNavigate();
 
     const handleAddReport = () => {
         navigate("/addReport");
     }
 
+    useEffect(() => {
+        loadReports();
+    }, []);
+
+    async function loadReports() {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await reportsAPI.getAll();
+            const normalizedReports = Array.isArray(data)
+                ? data
+                : data?.reports || data?.data || [];
+            setReports(normalizedReports);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const filteredReports = useMemo(() => {
+        return reports.filter(report => {
+            if (filter === 'all') return true;
+            if (filter === 'available') return report.waterAvailable;
+            if (filter === 'unavailable') return !report.waterAvailable;
+            if (filter === 'clean') return report.waterClean;
+            if (filter === 'notClean') return !report.waterClean;
+            if (filter === 'verified') return report.verified;
+            return true;
+        });
+    }, [reports, filter]);
+
+    const handleDeleteReport = async (reportId) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this report?");
+        if (!confirmDelete) return;
+        try {
+            setError(null);
+            setDeletingId(reportId);
+            await reportsAPI.delete(reportId);
+            await loadReports();
+            setCurrentPage(1);
+        } catch (err) {
+            setError(err.message || 'Failed to delete report');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleEditReport = (reportId) => {
+        navigate(`/addReport?reportId=${reportId}`);
+    };
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filter]);
+
+    useEffect(() => {
+        const totalPages = Math.max(1, Math.ceil(filteredReports.length / REPORTS_PER_PAGE));
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [filteredReports.length, currentPage]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredReports.length / REPORTS_PER_PAGE));
+    const startIndex = (currentPage - 1) * REPORTS_PER_PAGE;
+    const paginatedReports = filteredReports.slice(startIndex, startIndex + REPORTS_PER_PAGE);
+
+    const handleFilterChange = (value) => {
+        setFilter(value);
+    };
+
+    const handlePrevPage = () => {
+        setCurrentPage(prev => Math.max(1, prev - 1));
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage(prev => Math.min(totalPages, prev + 1));
+    };
+
+    if (loading) return <div>Loading reports...</div>;
+    if (error) return <div>Error: {error}</div>;
+    
     return(
         <>
         
@@ -26,33 +118,81 @@ function ReportPage(){
 
                 <div className="flex justify-center mb-10">
                     <h3 className="font-bold text-2xl mx-2">Filters:</h3>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer">All</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer">Available</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer">Unavailable</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer">Clean</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer">Not Clean</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer">Verified Only</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('all')}>All</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('available')}>Available</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('unavailable')}>Unavailable</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('clean')}>Clean</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('notClean')}>Not Clean</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('verified')}>Verified Only</Button>
                 </div>
 
             </div>
 
 
             <div className="flex justify-center">
-
-               <ReportCard  >
-                    <p>Hope this is working</p>
-                    {/* Add data here from the API */}
-               </ReportCard>
-
-              
-               
-                
+                {filteredReports.length === 0 ? (
+                    <p className="text-gray-500">No reports to display for this filter.</p>
+                ) : (
+                    <div className="flex flex-col items-center w-full">
+                        {paginatedReports.map((report) => {
+                            const reportId = report._id || report.id;
+                            return (
+                                <ReportCard
+                                    key={reportId}
+                                    onEdit={() => handleEditReport(reportId)}
+                                    onDelete={() => handleDeleteReport(reportId)}
+                                    isDeleting={deletingId === reportId}
+                                >
+                                    <div className="space-y-2">
+                                        <h4 className="text-xl font-semibold">{report.locationName || 'Unnamed Location'}</h4>
+                                        <p className="text-sm text-gray-600">{report.description || 'No description provided.'}</p>
+                                        <div className="grid grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <span className="font-medium">Water Available:</span>{' '}
+                                                {report.waterAvailable ? 'Yes' : 'No'}
+                                            </div>
+                                            <div>
+                                                <span className="font-medium">Water Clean:</span>{' '}
+                                                {report.waterClean ? 'Yes' : 'No'}
+                                            </div>
+                                            <div>
+                                                <span className="font-medium">Verified:</span>{' '}
+                                                {report.verified ? 'Yes' : 'No'}
+                                            </div>
+                                            <div>
+                                                <span className="font-medium">Reporter:</span>{' '}
+                                                {report.userId.name || 'Unknown'}
+                                            </div>
+                                        </div>
+                                        {report.createdAt && (
+                                            <p className="text-xs text-gray-500">
+                                                Submitted on {new Date(report.createdAt).toLocaleDateString()}
+                                            </p>
+                                        )}
+                                    </div>
+                                </ReportCard>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
 
-            <div className="flex justify-center">
-                <Button className="text-white bg-black me-6">Previous</Button>
-                <span>Page * of *</span>
-                <Button className="text-white bg-black ms-6">Next</Button>
+            <div className="flex justify-center mb-5">
+                <Button
+                    className="text-white bg-black me-6 hover:cursor-pointer disabled:opacity-50"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </Button>
+                <span>Page {filteredReports.length === 0 ? 0 : currentPage} of {filteredReports.length === 0 ? 0 : totalPages}</span>
+                <Button
+                    className="text-white bg-black ms-6 hover:cursor-pointer disabled:opacity-50"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages || filteredReports.length === 0}
+                >
+                    Next
+                </Button>
             </div>
 
         </>

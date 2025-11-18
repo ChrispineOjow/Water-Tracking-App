@@ -2,7 +2,8 @@ import {connectDB} from "./config/db.js";
 import "dotenv/config";
 import express from "express";
 import reportRouter from "./routes/report.routes.js";
-import userRouter from "./routes/user.route.js"
+import userRouter from "./routes/user.route.js";
+import cors from "cors"
 
 
 
@@ -16,6 +17,26 @@ app.use(express.urlencoded({extended:true}));
 
 //Database connection
 await connectDB();
+
+//Configuring cors
+const allowedOrigins =[
+    'http://localhost:5173'
+];
+const corsOptions = {
+    origin : (origin, callback)=>{
+        //Check if the request ing origin is in our list of allowed origins
+        if(allowedOrigins.includes(origin) || !origin){
+           //Allow acces
+            callback(null,true);
+        }else{
+            //Block access
+            callback(new Error('Not allowed to access this backend'))
+        }
+    }
+}
+
+app.use(cors(corsOptions));
+
 
 
 //End points

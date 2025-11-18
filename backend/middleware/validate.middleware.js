@@ -51,7 +51,7 @@ export const validateReport = [
 
 // Validation for MongoDB ObjectId params
 export const validateMongoId = [
-    param('id')
+    param('_id')
         .isMongoId().withMessage('Invalid ID format')
 ];
 
