@@ -3,6 +3,7 @@ import  ReportCard  from "../components/ReportCard";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from 'react';
 import { reportsAPI } from '../lib/api';
+import { Spinner } from "@/components/ui/spinner";
 
 
 
@@ -19,7 +20,7 @@ function ReportPage(){
     const navigate = useNavigate();
 
     const handleAddReport = () => {
-        navigate("/addReport");
+        navigate("/addReports");
     }
 
     useEffect(() => {
@@ -101,7 +102,11 @@ function ReportPage(){
         setCurrentPage(prev => Math.min(totalPages, prev + 1));
     };
 
-    if (loading) return <div>Loading reports...</div>;
+
+    
+    if (loading) return <div className="flex justify-center items-center h-screen">
+                            <Spinner className="size-12"/>
+                        </div>;
     if (error) return <div>Error: {error}</div>;
     
     return(
@@ -139,12 +144,13 @@ function ReportPage(){
                             return (
                                 <ReportCard
                                     key={reportId}
+                                    locationName={report.locationName}
                                     onEdit={() => handleEditReport(reportId)}
                                     onDelete={() => handleDeleteReport(reportId)}
                                     isDeleting={deletingId === reportId}
                                 >
                                     <div className="space-y-2">
-                                        <h4 className="text-xl font-semibold">{report.locationName || 'Unnamed Location'}</h4>
+                                        
                                         <p className="text-sm text-gray-600">{report.description || 'No description provided.'}</p>
                                         <div className="grid grid-cols-2 gap-4 text-sm">
                                             <div>

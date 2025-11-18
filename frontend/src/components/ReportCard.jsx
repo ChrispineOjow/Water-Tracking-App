@@ -3,6 +3,7 @@ import { Card, CardContent } from "./ui/card";
 import { cn } from "@/lib/utils";
 
 function ReportCard({
+    locationName,
     children,
     className,
     onEdit,
@@ -14,6 +15,10 @@ function ReportCard({
         <>
             <Card className={cn("relative min-h-32 w-[80%] ms-15 mb-10", className)}>
                 <CardContent className="h-full p-6">
+
+                    <h4 className="text-xl font-semibold mb-3">
+                     {locationName || 'Unnamed Location'}
+                    </h4>
                     {children}
                     {(onEdit || onDelete) && !disableActions && (
                         <div className="absolute bottom-4 right-4 flex gap-2">

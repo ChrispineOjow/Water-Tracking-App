@@ -1,5 +1,6 @@
 import WaterReport from "../models/WaterReport.model.js";
 import User from "../models/User.model.js";
+import { getReportLocationName } from "../utils/geoCodingutils.js";
 
 //Create a water report
 export const createReport = async(req, res)=>{
@@ -98,11 +99,26 @@ export const updateReport = async (req, res) => {
 export const getAllReports = async (req, res)=>{
     
     try{
-        const reports = await WaterReport.find().populate('userId','name email location').sort({timestamp:-1})
+        const reports = await WaterReport.find().populate('userId','name email location').sort({timestamp:-1}).lean()
+
+        // so as to get the data like coordinates name instead of the number array
+        const enrichedReports = await Promise.all(
+            reports.map(async (report) => {
+                if (report.location?.coordinates && report.location.coordinates.length === 2) {
+                    const [lon, lat] = report.location.coordinates; 
+                    
+                    const locationName = await getReportLocationName(lon, lat);
+                
+                    return { ...report, locationName };
+                    }
+
+                return { ...report, locationName: 'Location Data Missing' };
+            })
+        );
 
         res.status(200).json({
-            count:reports.length,
-            reports
+            count: enrichedReports.length,
+            reports: enrichedReports 
         });
 
     }catch(error){
