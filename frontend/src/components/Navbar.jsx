@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle } from "../components/ui/drawer";
 import { useState } from "react";
+import { UserButton, SignedIn, SignedOut } from "@clerk/clerk-react";
 
 
 function Navbar(){
@@ -48,9 +49,35 @@ function Navbar(){
 
                             <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
                                 <NavigationMenuLink asChild>
-                                    <Link to="/setting">Settings</Link>
+                                    <Link to="/settings">Settings</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
+
+                            <SignedOut>
+                                <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
+                                    <NavigationMenuLink asChild>
+                                        <Link to="/sign-in">Sign In</Link>
+                                    </NavigationMenuLink>
+                                </NavigationMenuItem>
+                                <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
+                                    <NavigationMenuLink asChild>
+                                        <Link to="/sign-up">Sign Up</Link>
+                                    </NavigationMenuLink>
+                                </NavigationMenuItem>
+                            </SignedOut>
+
+                            <SignedIn>
+                                <NavigationMenuItem className="flex items-center me-4">
+                                    <UserButton 
+                                        afterSignOutUrl="/"
+                                        appearance={{
+                                            elements: {
+                                                avatarBox: "h-8 w-8"
+                                            }
+                                        }}
+                                    />
+                                </NavigationMenuItem>
+                            </SignedIn>
                             
 
                         </NavigationMenuList>
@@ -76,10 +103,28 @@ function Navbar(){
                                     
                                 </DrawerHeader>
 
-                                <Link to="/" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Home</Link>
-                                <Link to="/reports" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Reports</Link>
-                                <Link to="/addReports" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Add Reports</Link>
-                                <Link to="/setting" onClick={() => useState(false)} className="py-2 text-lg font-medium hover:text-blue-600">Settings</Link>
+                                <Link to="/" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Home</Link>
+                                <Link to="/reports" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Reports</Link>
+                                <Link to="/addReports" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Add Reports</Link>
+                                <Link to="/settings" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Settings</Link>
+                                
+                                <SignedOut>
+                                    <Link to="/sign-in" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Sign In</Link>
+                                    <Link to="/sign-up" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Sign Up</Link>
+                                </SignedOut>
+                                
+                                <SignedIn>
+                                    <div className="py-2 flex items-center">
+                                        <UserButton 
+                                            afterSignOutUrl="/"
+                                            appearance={{
+                                                elements: {
+                                                    avatarBox: "h-8 w-8"
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </SignedIn>
 
                             </DrawerContent>
                         </Drawer>

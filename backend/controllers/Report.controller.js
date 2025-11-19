@@ -1,11 +1,9 @@
 import WaterReport from "../models/WaterReport.model.js";
-import User from "../models/User.model.js";
 import { getReportLocationName } from "../utils/geoCodingutils.js";
 
 //Create a water report
 export const createReport = async(req, res)=>{
     try{
-
         const {userId, location, waterAvailable, waterClean, description} = req.body
         const coordinates = location.coordinates
 
@@ -13,15 +11,6 @@ export const createReport = async(req, res)=>{
         if(!coordinates || !Array.isArray(coordinates) ||coordinates.length !== 2){
             return res.status(400).json({
                 message: "Valid coordinates [longitude, latitude] are required"
-            });
-        };
-
-        //Checking if the user exists
-        const user = await User.findById(userId);
-
-        if(!user){
-            return res.status(400).json({
-                message: "User not found"
             });
         };
 

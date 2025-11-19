@@ -16,10 +16,7 @@ export const handleValidation = (req, res, next)=>{
 
 //Validation rules for creating and updating water reports
 export const validateReport = [
-    
-    body("userId")
-        .notEmpty().withMessage("User id is required")
-        .isMongoId().withMessage("Invalid userId fromat"),
+    body("userId").notEmpty().withMessage("User id is required").isMongoId().withMessage("Invalid userId format"),
     body('location.coordinates')
         .isArray({ min: 2, max: 2 }).withMessage('Coordinates must be an array of [longitude, latitude]')
         .custom((value) => {

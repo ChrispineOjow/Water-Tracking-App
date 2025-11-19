@@ -1,12 +1,46 @@
 import { Button } from "@/components/ui/button";
 import StatisticCard from "../components/StatisticCard";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { reportsAPI } from "../lib/api";
 
 
 function HomePage(){
 
     //This is to navigate to the reports page
     const navigate = useNavigate();
+
+    // State for statistics
+    const [statistics, setStatistics] = useState({
+        total: 0,
+        waterAvailable: 0,
+        cleanWater: 0,
+        availableAndClean: 0,
+        availableButNotClean: 0,
+        noWater: 0,
+        notCleanWater: 0
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Fetch statistics on component mount
+    useEffect(() => {
+        const fetchStatistics = async () => {
+            try {
+                setLoading(true);
+                const stats = await reportsAPI.getStats();
+                setStatistics(stats);
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching statistics:", err);
+                setError("Failed to load statistics");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStatistics();
+    }, []);
 
     const handleViewReports = () =>  {
         
@@ -34,21 +68,54 @@ function HomePage(){
 
             <div className="py-12">
                 <h1 className="text-center mt-5 font-bold text-2xl">Recent Statistics</h1>
-                <div className="flex justify-center">
+                {error && (
+                    <p className="text-center text-red-500 mt-4">{error}</p>
+                )}
+                <div className="flex justify-center flex-wrap gap-4">
 
                     <StatisticCard>
-                        <h3 className=" text-center font-semibold text-xl ">Total Reports</h3>
-                        {/* remember to add api to call statistics */}
+                        <h3 className="text-center font-semibold text-xl mb-4">Total Reports</h3>
+                        {loading ? (
+                            <p className="text-center text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.total}</p>
+                        )}
                     </StatisticCard>
 
                     <StatisticCard>
-                        <h3 className="text-center font-semibold text-xl">Water Available</h3>
-                        {/* remember to add api to call statistics */}
+                        <h3 className="text-center font-semibold text-xl mb-4">Water Available</h3>
+                        {loading ? (
+                            <p className="text-center text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.waterAvailable}</p>
+                        )}
                     </StatisticCard>
 
                     <StatisticCard>
-                        <h3 className="text-center font-semibold text-xl">Clean Water</h3>
-                        {/* remember to add api to call statistics */}
+                        <h3 className="text-center font-semibold text-xl mb-4">Clean Water</h3>
+                        {loading ? (
+                            <p className="text-center text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.cleanWater}</p>
+                        )}
+                    </StatisticCard>
+
+                    <StatisticCard>
+                        <h3 className="text-center font-semibold text-xl mb-4">No Water</h3>
+                        {loading ? (
+                            <p className="text-center text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.noWater}</p>
+                        )}
+                    </StatisticCard>
+
+                    <StatisticCard>
+                        <h3 className="text-center font-semibold text-xl mb-4">Not Clean Water</h3>
+                        {loading ? (
+                            <p className="text-center text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.notCleanWater}</p>
+                        )}
                     </StatisticCard>
                 </div>
 
@@ -57,15 +124,23 @@ function HomePage(){
 
             <div className="py-12 ">
                 <h1 className="text-center font-bold text-2xl ">Recent Reports from Your Area</h1>
-                <div className="flex items-center justify-center">
-                    <StatisticCard className="w-[70%] flex ">
-                        <h2 className="font-semibold text-center text-lg">Water Available and Clean</h2>
-                        {/*Remember to add data here*/ }
+                <div className="flex items-center justify-center gap-4">
+                    <StatisticCard className="w-[70%] flex flex-col items-center justify-center">
+                        <h2 className="font-semibold text-center text-lg mb-4">Water Available and Clean</h2>
+                        {loading ? (
+                            <p className="text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.availableAndClean}</p>
+                        )}
                     </StatisticCard>
 
-                    <StatisticCard className="w-[70%] flex ">
-                        <h2 className="font-semibold text-center text-lg">Water Available but Not Clean</h2>
-                        {/*Remember to add data here*/ }
+                    <StatisticCard className="w-[70%] flex flex-col items-center justify-center">
+                        <h2 className="font-semibold text-center text-lg mb-4">Water Available but Not Clean</h2>
+                        {loading ? (
+                            <p className="text-gray-500">Loading...</p>
+                        ) : (
+                            <p className="text-center text-3xl font-bold">{statistics.availableButNotClean}</p>
+                        )}
                     </StatisticCard>
                 </div>
 
