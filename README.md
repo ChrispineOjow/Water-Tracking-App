@@ -2,6 +2,11 @@
 
 A community-driven water tracking application that enables local populations to report and track water availability and quality in their areas. This MERN stack application helps collect valuable data about water resources, making it easier to identify areas with water access issues and monitor water cleanliness.
 
+
+## Link
+
+This is the link to the website: [Water Tracker](https://water-tracker-gules.vercel.app/)
+
 ## 🌊 Overview
 
 The Water Tracking App is designed to empower communities by allowing residents to:
