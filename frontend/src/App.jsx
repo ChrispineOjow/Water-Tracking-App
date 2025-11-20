@@ -21,7 +21,7 @@ function App() {
             <SignInPage/>
           </PublicRoute>
         } />
-        <Route path="/sign-up" element={
+        <Route path="/sign-up/*" element={
           <PublicRoute>
             <SignUpPage/>
           </PublicRoute>
