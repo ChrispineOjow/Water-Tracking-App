@@ -121,14 +121,16 @@ function ReportPage(){
                     </Button>
                 </div>
 
-                <div className="flex justify-center mb-10">
-                    <h3 className="font-bold text-2xl mx-2">Filters:</h3>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('all')}>All</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('available')}>Available</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('unavailable')}>Unavailable</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('clean')}>Clean</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('notClean')}>Not Clean</Button>
-                    <Button className="bg-black text-white mx-5 hover:cursor-pointer" onClick={() => handleFilterChange('verified')}>Verified Only</Button>
+                <div className="flex justify-center   mb-10">
+                    <h3 className="font-bold text-2xl">Filters:</h3>
+                    <div className="flex justify-center flex-wrap  mb-10">
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('all')}>All</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('available')}>Available</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('unavailable')}>Unavailable</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('clean')}>Clean</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('notClean')}>Not Clean</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('verified')}>Verified Only</Button>
+                    </div>
                 </div>
 
             </div>

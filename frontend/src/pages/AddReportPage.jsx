@@ -130,7 +130,7 @@ function AddReport(){
         <>
 
             <div className="flex justify-center bg-gray-300 p-12 min-h-screen">
-                <div className="text-center w-[50%] bg-white rounded-4xl p-5">
+                <div className="text-center w-[90%] bg-white rounded-4xl p-5">
                     <h1 className="text-3xl font-bold mb-6">Submit Water Report</h1>
                     
                     {error && (
