@@ -23,7 +23,7 @@ await connectDB();
 //Configuring cors
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || "")
     .split(",")
-    .map(origin=>origin.trim)
+    .map(origin=>origin.trim())
     .filter(Boolean)
 const corsOptions = {
     origin : (origin, callback)=>{
