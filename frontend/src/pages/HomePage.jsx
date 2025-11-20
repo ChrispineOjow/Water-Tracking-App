@@ -3,6 +3,7 @@ import StatisticCard from "../components/StatisticCard";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { reportsAPI } from "../lib/api";
+import { Spinner } from "@/components/ui/spinner";
 
 
 function HomePage(){
@@ -76,7 +77,9 @@ function HomePage(){
                     <StatisticCard>
                         <h3 className="text-center font-semibold text-xl mb-4">Total Reports</h3>
                         {loading ? (
-                            <p className="text-center text-gray-500">Loading...</p>
+                            <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.total}</p>
                         )}
@@ -85,7 +88,9 @@ function HomePage(){
                     <StatisticCard>
                         <h3 className="text-center font-semibold text-xl mb-4">Water Available</h3>
                         {loading ? (
-                            <p className="text-center text-gray-500">Loading...</p>
+                            <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.waterAvailable}</p>
                         )}
@@ -94,7 +99,9 @@ function HomePage(){
                     <StatisticCard>
                         <h3 className="text-center font-semibold text-xl mb-4">Clean Water</h3>
                         {loading ? (
-                            <p className="text-center text-gray-500">Loading...</p>
+                            <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.cleanWater}</p>
                         )}
@@ -103,7 +110,9 @@ function HomePage(){
                     <StatisticCard>
                         <h3 className="text-center font-semibold text-xl mb-4">No Water</h3>
                         {loading ? (
-                            <p className="text-center text-gray-500">Loading...</p>
+                            <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.noWater}</p>
                         )}
@@ -112,7 +121,9 @@ function HomePage(){
                     <StatisticCard>
                         <h3 className="text-center font-semibold text-xl mb-4">Not Clean Water</h3>
                         {loading ? (
-                            <p className="text-center text-gray-500">Loading...</p>
+                            <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.notCleanWater}</p>
                         )}
@@ -128,7 +139,9 @@ function HomePage(){
                     <StatisticCard className="w-[70%] flex flex-col items-center justify-center">
                         <h2 className="font-semibold text-center text-lg mb-4">Water Available and Clean</h2>
                         {loading ? (
-                            <p className="text-gray-500">Loading...</p>
+                           <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.availableAndClean}</p>
                         )}
@@ -137,7 +150,9 @@ function HomePage(){
                     <StatisticCard className="w-[70%] flex flex-col items-center justify-center">
                         <h2 className="font-semibold text-center text-lg mb-4">Water Available but Not Clean</h2>
                         {loading ? (
-                            <p className="text-gray-500">Loading...</p>
+                            <div className="flex justify-center">
+                             <Spinner/>
+                            </div>
                         ) : (
                             <p className="text-center text-3xl font-bold">{statistics.availableButNotClean}</p>
                         )}

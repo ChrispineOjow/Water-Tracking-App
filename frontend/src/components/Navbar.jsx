@@ -47,12 +47,6 @@ function Navbar(){
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
 
-                            <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
-                                <NavigationMenuLink asChild>
-                                    <Link to="/settings">Settings</Link>
-                                </NavigationMenuLink>
-                            </NavigationMenuItem>
-
                             <SignedOut>
                                 <NavigationMenuItem className="rounded transition me-4  duration-200 ease-in-out hover:bg-white hover:text-black">
                                     <NavigationMenuLink asChild>
@@ -106,7 +100,7 @@ function Navbar(){
                                 <Link to="/" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Home</Link>
                                 <Link to="/reports" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Reports</Link>
                                 <Link to="/addReports" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Add Reports</Link>
-                                <Link to="/settings" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Settings</Link>
+
                                 
                                 <SignedOut>
                                     <Link to="/sign-in" onClick={() => setIsOpen(false)} className="py-2 text-lg font-medium hover:text-blue-600">Sign In</Link>

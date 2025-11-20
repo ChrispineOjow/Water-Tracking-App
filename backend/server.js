@@ -11,6 +11,7 @@ import cors from "cors";
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS;
 
 //Middlewares
 app.use(express.json())
@@ -21,7 +22,7 @@ await connectDB();
 
 //Configuring cors
 const allowedOrigins =[
-    'http://localhost:5173'
+    ALLOWED_ORIGINS
 ];
 const corsOptions = {
     origin : (origin, callback)=>{
@@ -50,18 +51,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Request logging middleware (for debugging)
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api')) {
-        console.log(`\n📥 ${req.method} ${req.path}`);
-        console.log('Headers:', {
-            authorization: req.headers.authorization ? 'Bearer ***' : 'Missing',
-            'content-type': req.headers['content-type']
-        });
-    }
-    next();
-});
-
 //End points
 app.get("/", async(req, res)=>{
     res.send(`The Server is up and running`);
@@ -71,16 +60,6 @@ app.get("/", async(req, res)=>{
 app.use('/api', reportRouter);
 app.use('/api',userRouter);
 
-// Error handling middleware (must be after routes)
-app.use((err, req, res, next) => {
-    console.error('\n❌ Error occurred:');
-    console.error('Error message:', err.message);
-    console.error('Error stack:', err.stack);
-    res.status(err.status || 500).json({
-        message: err.message || 'Internal Server Error',
-        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-});
 
 
 //Listen to the PORT

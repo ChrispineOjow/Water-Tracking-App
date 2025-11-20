@@ -41,11 +41,6 @@ function App() {
             <AddReport/>
           </ProtectedRoute>
         }/>
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <Setting/>
-          </ProtectedRoute>
-        } />
       </Routes>
     </>
   )
