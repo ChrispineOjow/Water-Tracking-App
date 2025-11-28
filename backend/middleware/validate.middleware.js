@@ -2,21 +2,19 @@ import{body,param,validationResult} from "express-validator";
  
 //Middleware to handle validation
 export const handleValidation = (req, res, next)=>{
-
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         return res.status(400).json({
             message:"Validation failed",
             errors:errors.array()
         });
-
     }
     next();
 }
 
 //Validation rules for creating and updating water reports
 export const validateReport = [
-    body("userId").notEmpty().withMessage("User id is required").isMongoId().withMessage("Invalid userId format"),
+    // userId is no longer validated here — controller gets it from req.userDB
     body('location.coordinates')
         .isArray({ min: 2, max: 2 }).withMessage('Coordinates must be an array of [longitude, latitude]')
         .custom((value) => {
@@ -51,6 +49,3 @@ export const validateMongoId = [
     param('_id')
         .isMongoId().withMessage('Invalid ID format')
 ];
-
-
-

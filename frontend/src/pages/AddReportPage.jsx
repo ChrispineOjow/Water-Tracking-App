@@ -5,13 +5,14 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { reportsAPI, userAPI } from "../lib/api";
 import { Loader2 } from "lucide-react";
 
 
 function AddReport(){
-    const { userId: clerkId, isSignedIn, isLoaded, user } = useAuth();
+    const { userId: clerkId, isSignedIn, isLoaded, getToken } = useAuth();
+    const { user } = useUser();
     const navigate = useNavigate();
     
     const [isAvailable, setIsAvailable] = useState("available")
@@ -53,74 +54,40 @@ function AddReport(){
         );
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+   // ...existing code...
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
 
-        // Wait for auth to load
-        if (!isLoaded) {
-            setError("Loading authentication...");
-            return;
-        }
+  try {
+    const token = typeof getToken === "function" ? await getToken() : null;
+    if (!token) {
+      setError("Please sign in.");
+      setLoading(false);
+      return;
+    }
 
-        // Check if user is signed in
-        if (!isSignedIn || !clerkId) {
-            setError("You must be signed in to submit a report. Please sign in first.");
-            return;
-        }
-
-        if (!latitude || !longitude) {
-            setError("Location is required. Please allow location access or enter coordinates manually.");
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            // Get user email and name from Clerk
-            const userEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || '';
-            const userName = user?.fullName || user?.firstName || user?.username || 'User';
-
-            // Get or create user in backend database
-            const userData = await userAPI.getOrCreateUser(
-                clerkId,
-                userName,
-                userEmail,
-                [longitude, latitude] // [longitude, latitude] for MongoDB
-            );
-
-            if (!userData || !userData.user || !userData.user._id) {
-                setError("Failed to get or create user. Please try again.");
-                setLoading(false);
-                return;
-            }
-
-            // Create report with userId from backend
-            const reportData = {
-                userId: userData.user._id,
-                location: {
-                    coordinates: [longitude, latitude] // [longitude, latitude] as per MongoDB format
-                },
-                waterAvailable: isAvailable === "available",
-                waterClean: isClean === "clean",
-                description: description.trim()
-            };
-
-            await reportsAPI.create(reportData);
-            
-            // Navigate to reports page on success
-            navigate("/reports");
-        } catch (err) {
-            console.error("Error submitting report:", err);
-            const errorMessage = err.response?.data?.message || 
-                                err.response?.data?.error || 
-                                err.message || 
-                                "Failed to submit report. Please try again.";
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
-        }
+    const reportData = {
+      location: { coordinates: [longitude, latitude] },
+      waterAvailable: isAvailable === "available",
+      waterClean: isClean === "clean",
+      description
     };
+
+    console.log("Submitting reportData:", reportData); // DEBUG
+
+    await reportsAPI.create(reportData, token);
+    navigate("/reports");
+  } catch (err) {
+    console.error("Submit error:", err);
+    console.log("Error response:", err.response?.data); // DEBUG
+    setError(err.response?.data?.message || "Failed to submit report");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     const handleCancel = () => {
         navigate("/reports");

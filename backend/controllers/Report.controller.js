@@ -4,15 +4,23 @@ import { getReportLocationName } from "../utils/geoCodingutils.js";
 //Create a water report
 export const createReport = async(req, res)=>{
     try{
-        const {userId, location, waterAvailable, waterClean, description} = req.body
-        const coordinates = location.coordinates
+        const { location, waterAvailable, waterClean, description } = req.body;
+        const userId = req.userDB?._id; // get userId from authenticated user, not body
+
+        if (!userId) {
+            return res.status(401).json({
+                message: "Unauthenticated - user not found"
+            });
+        }
+
+        const coordinates = location?.coordinates;
 
         //Coordinate validation
-        if(!coordinates || !Array.isArray(coordinates) ||coordinates.length !== 2){
+        if(!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2){
             return res.status(400).json({
                 message: "Valid coordinates [longitude, latitude] are required"
             });
-        };
+        }
 
         //Report creation
         const newReport = new WaterReport({
@@ -24,8 +32,7 @@ export const createReport = async(req, res)=>{
             waterAvailable,
             waterClean,
             description: description || ''
-
-        })
+        });
 
         const savedReport = await newReport.save();
 
@@ -34,18 +41,14 @@ export const createReport = async(req, res)=>{
             savedReport
         });
 
-
     }catch(error){
-
         console.error("Error creating report", error);
         res.status(500).json({
             message:"Server error",
             error:error.message
         });
-
-    };
+    }
 };
-
 
 //Update water report
 export const updateReport = async (req, res) => {

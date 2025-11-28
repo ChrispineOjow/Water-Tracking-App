@@ -1,17 +1,16 @@
-import {userRegistration, getUser, getUserByClerkId, getCurrentUser} from "../controllers/user.controller.js";
+import { getAllUsers,getOrCreateUser, createOrSyncUser} from "../controllers/user.controller.js";
 import express from "express";
+import { requireAuth } from "@clerk/express";
+import { syncClerkUser } from "../middleware/clerk.middleware.js";
 
 const userRouter = express.Router();
 
-//Create and get User
-userRouter.route("/user")
-    .post(userRegistration)// For user registration
-    .get(getUser)//To get the users
+//Get al users
+userRouter.get("/users", getAllUsers);
+// GET user by clerk id (only owner can access)
+userRouter.get("/user/clerk/:clerkId", requireAuth(), syncClerkUser, getOrCreateUser);
 
-// Get current authenticated user
-userRouter.get("/user/me", getCurrentUser);
-
-// Get user by clerkId
-userRouter.get("/user/clerk/:clerkId", getUserByClerkId);
+// POST create/sync user
+userRouter.post("/user", requireAuth(), syncClerkUser, createOrSyncUser);
 
 export default userRouter;

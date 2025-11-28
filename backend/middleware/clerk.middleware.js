@@ -1,76 +1,63 @@
-import { clerkClient, requireAuth } from '@clerk/express';
+import { getAuth, clerkClient } from "@clerk/express";
+import User from "../models/User.model.js";
 
-// Check if CLERK_SECRET_KEY is set
-if (!process.env.CLERK_SECRET_KEY) {
-  console.error('ERROR: CLERK_SECRET_KEY is not set in environment variables');
-  console.error('Clerk authentication will not work properly without this key.');
-  console.error('Please add CLERK_SECRET_KEY to your backend .env file');
-} else {
-  console.log('CLERK_SECRET_KEY is configured');
-}
-
-// Middleware to verify Clerk authentication
-// This automatically verifies the JWT token from Authorization header
-// If token is invalid or missing, it will automatically return 401
-export const verifyAuth = requireAuth({
-  // Clerk will automatically use CLERK_SECRET_KEY from environment
-  // If secret key is missing, this will fail
-});
-
-// Helper function to get authenticated user info from request
-export const getAuthUser = async (req) => {
+export async function syncClerkUser(req, res, next) {
   try {
-    // Check if req.auth exists (set by requireAuth middleware)
-    if (!req.auth || !req.auth.userId) {
-      console.error('No auth data in request - middleware may not have run');
-      return null;
-    }
-
-    const { userId } = req.auth;
+    const { userId } = getAuth(req);
     
     if (!userId) {
-      return null;
+      console.log("syncClerkUser: no userId from auth");
+      return next();
     }
 
-    try {
-      // Get user details from Clerk
-      const user = await clerkClient.users.getUser(userId);
-      
-      // Get email - try multiple sources
-      const email = user.emailAddresses?.[0]?.emailAddress || 
-                   user.primaryEmailAddressId ? 
-                     user.emailAddresses?.find(e => e.id === user.primaryEmailAddressId)?.emailAddress : 
-                     '' ||
-                   user.emailAddresses?.[0]?.emailAddress || 
-                   '';
+    console.log("syncClerkUser: fetching Clerk user for", userId);
 
-      const firstName = user.firstName || '';
-      const lastName = user.lastName || '';
-      const username = user.username || '';
-      
-      const fullName = `${firstName} ${lastName}`.trim() || username || 'User';
+    // Fetch Clerk user profile
+    const clerkUser = await clerkClient.users.getUser(userId);
+    console.log("syncClerkUser: Clerk user fetched:", clerkUser.id);
 
-      return {
+    // Extract name and email from Clerk
+    const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress || null;
+    const fullName =
+      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ||
+      clerkUser.username ||
+      "User";
+
+    console.log("syncClerkUser: extracted name=", fullName, "email=", primaryEmail);
+
+    // Upsert user into DB
+    let user = await User.findOne({ clerkId: userId });
+
+    if (!user) {
+      console.log("syncClerkUser: creating new user");
+      user = await User.create({
         clerkId: userId,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        fullName: fullName
-      };
-    } catch (error) {
-      console.error('Error fetching user from Clerk:', error);
-      // Return basic info even if Clerk API call fails
-      return {
-        clerkId: userId,
-        email: `user_${userId}@temp.com`, // Temporary email if we can't get it
-        firstName: '',
-        lastName: '',
-        fullName: 'User'
-      };
+        email: primaryEmail,
+        name: fullName,
+        location: { type: "Point", coordinates: [0, 0] }
+      });
+      console.log("syncClerkUser: user created:", user._id);
+    } else {
+      console.log("syncClerkUser: user exists, syncing");
+      // Update if Clerk data changed
+      const needsUpdate =
+        (primaryEmail && user.email !== primaryEmail) ||
+        (fullName && user.name !== fullName);
+
+      if (needsUpdate) {
+        if (primaryEmail) user.email = primaryEmail;
+        if (fullName) user.name = fullName;
+        await user.save();
+        console.log("syncClerkUser: user updated");
+      }
     }
-  } catch (error) {
-    console.error('Error in getAuthUser:', error);
-    return null;
+
+    // Attach to request for controllers
+    req.clerkUser = clerkUser;
+    req.userDB = user;
+    return next();
+  } catch (err) {
+    console.error("syncClerkUser error:", err.message);
+    return res.status(500).json({ message: "User sync failed", error: err.message });
   }
-};
-
+}
