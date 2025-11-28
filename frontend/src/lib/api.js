@@ -42,8 +42,26 @@ export const reportsAPI = {
     return response.data;
   },
   getStats: async () => {
-    const response = await api.get('/reports');
-    return response.data.reports || response.data || [];
+    try {
+      const response = await api.get('/reports');
+      const reports = response.data.reports || response.data || [];
+      
+      // Calculate statistics from reports
+      const stats = {
+        total: reports.length,
+        waterAvailable: reports.filter(r => r.waterAvailable).length,
+        cleanWater: reports.filter(r => r.waterClean).length,
+        availableAndClean: reports.filter(r => r.waterAvailable && r.waterClean).length,
+        availableButNotClean: reports.filter(r => r.waterAvailable && !r.waterClean).length,
+        noWater: reports.filter(r => !r.waterAvailable).length,
+        notCleanWater: reports.filter(r => !r.waterClean).length
+      };
+      
+      return stats;
+    } catch (err) {
+      console.error("Error calculating statistics:", err);
+      throw err;
+    }
   }
 };
 
