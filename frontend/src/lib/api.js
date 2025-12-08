@@ -32,7 +32,7 @@ export const reportsAPI = {
     const response = await api.put(`/reports/${id}`, reportData, { headers });
     return response.data;
   },
-  delete: async (id, token) => {
+   delete: async (id, token) => {
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await api.delete(`/reports/${id}`, { headers });
     return response.data;

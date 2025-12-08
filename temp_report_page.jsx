@@ -1,29 +1,22 @@
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import ReportCard from "../components/ReportCard";
-import EditReportModal from "../components/EditReportModal";
-import DeleteReportModal from "../components/DeleteReportModal";
+import  ReportCard  from "../components/ReportCard";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from 'react';
 import { reportsAPI } from '../lib/api';
 import { Spinner } from "@/components/ui/spinner";
-import { useAuth, useUser } from "@clerk/clerk-react";
+
+
 
 const REPORTS_PER_PAGE = 5;
 
-function ReportPage() {
+function ReportPage(){
+
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all');
-    const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [deletingId, setDeletingId] = useState(null);
-    const [editingReport, setEditingReport] = useState(null);
-    const [reportToDelete, setReportToDelete] = useState(null);
-    const [saving, setSaving] = useState(false);
-    const { getToken } = useAuth();
-    const { user } = useUser();
     const navigate = useNavigate();
 
     const handleAddReport = () => {
@@ -52,16 +45,6 @@ function ReportPage() {
 
     const filteredReports = useMemo(() => {
         return reports.filter(report => {
-            // Search filter
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                const locationName = report.locationName?.toLowerCase() || '';
-                if (!locationName.includes(query)) {
-                    return false;
-                }
-            }
-
-            // Category filter
             if (filter === 'all') return true;
             if (filter === 'available') return report.waterAvailable;
             if (filter === 'unavailable') return !report.waterAvailable;
@@ -70,66 +53,31 @@ function ReportPage() {
             if (filter === 'verified') return report.verified;
             return true;
         });
-    }, [reports, filter, searchQuery]);
+    }, [reports, filter]);
 
-    const handleDeleteClick = (report) => {
-        setReportToDelete(report);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (!reportToDelete) return;
-
+    const handleDeleteReport = async (reportId) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this report?");
+        if (!confirmDelete) return;
         try {
-            setDeletingId(reportToDelete._id || reportToDelete.id);
-            const token = typeof getToken === "function" ? await getToken() : null;
-            if (!token) {
-                alert("Please sign in.");
-                return;
-            }
-
-            await reportsAPI.delete(reportToDelete._id || reportToDelete.id, token);
+            setError(null);
+            setDeletingId(reportId);
+            await reportsAPI.delete(reportId);
             await loadReports();
             setCurrentPage(1);
-            setReportToDelete(null);
-        } catch (error) {
-            console.error("Error deleting report:", error);
-            alert(error.response?.data?.message || "Failed to delete report");
+        } catch (err) {
+            setError(err.message || 'Failed to delete report');
         } finally {
             setDeletingId(null);
         }
     };
 
     const handleEditReport = (reportId) => {
-        const reportToEdit = reports.find(r => (r._id || r.id) === reportId);
-        if (reportToEdit) {
-            setEditingReport(reportToEdit);
-        }
-    };
-
-    const handleSaveEdit = async (formData) => {
-        if (!editingReport) return;
-        try {
-            setSaving(true);
-            const token = await getToken();
-            if (!token) {
-                alert("Please sign in.");
-                return;
-            }
-            const reportId = editingReport._id || editingReport.id;
-            await reportsAPI.update(reportId, formData, token);
-            await loadReports();
-            setEditingReport(null);
-        } catch (err) {
-            console.error("Failed to update report", err);
-            alert(err.response?.data?.message || "Failed to update report");
-        } finally {
-            setSaving(false);
-        }
+        navigate(`/addReport?reportId=${reportId}`);
     };
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [filter, searchQuery]);
+    }, [filter]);
 
     useEffect(() => {
         const totalPages = Math.max(1, Math.ceil(filteredReports.length / REPORTS_PER_PAGE));
@@ -154,16 +102,18 @@ function ReportPage() {
         setCurrentPage(prev => Math.min(totalPages, prev + 1));
     };
 
-    if (loading) return (
-        <div className="flex justify-center items-center h-screen">
-            <Spinner className="size-12" />
-        </div>
-    );
-    if (error) return <div>Error: {error}</div>;
 
-    return (
+    
+    if (loading) return <div className="flex justify-center items-center h-screen">
+                            <Spinner className="size-12"/>
+                        </div>;
+    if (error) return <div>Error: {error}</div>;
+    
+    return(
         <>
+        
             <div>
+
                 <div className="flex m-5 justify-between items-center">
                     <h3 className="font-bold  text-3xl space-x-2">Water Reports</h3>
                     <Button className="space-x-7 p-6 bg-black text-white hover:cursor-pointer" onClick={handleAddReport}>
@@ -171,30 +121,20 @@ function ReportPage() {
                     </Button>
                 </div>
 
-                <div className="flex justify-center mb-6">
-                    <div className="w-full max-w-md">
-                        <Input
-                            type="text"
-                            placeholder="Search by location name..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full border-black"
-                        />
-                    </div>
-                </div>
-
                 <div className="flex justify-center   mb-10">
                     <h3 className="font-bold text-2xl">Filters:</h3>
                     <div className="flex justify-center flex-wrap  mb-10">
-                        <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('all')}>All</Button>
-                        <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('available')}>Available</Button>
-                        <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('unavailable')}>Unavailable</Button>
-                        <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('clean')}>Clean</Button>
-                        <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('notClean')}>Not Clean</Button>
-                        <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('verified')}>Verified Only</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('all')}>All</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('available')}>Available</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('unavailable')}>Unavailable</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('clean')}>Clean</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('notClean')}>Not Clean</Button>
+                    <Button className="bg-black text-white mx-5 hover:cursor-pointer my-4" onClick={() => handleFilterChange('verified')}>Verified Only</Button>
                     </div>
                 </div>
+
             </div>
+
 
             <div className="flex justify-center">
                 {filteredReports.length === 0 ? (
@@ -203,16 +143,16 @@ function ReportPage() {
                     <div className="flex flex-col items-center w-full">
                         {paginatedReports.map((report) => {
                             const reportId = report._id || report.id;
-                            const isOwner = user && report.userId && user.id === report.userId.clerkId;
                             return (
                                 <ReportCard
                                     key={reportId}
                                     locationName={report.locationName}
-                                    onEdit={isOwner ? () => handleEditReport(reportId) : null}
-                                    onDelete={isOwner ? () => handleDeleteClick(report) : null}
+                                    onEdit={() => handleEditReport(reportId)}
+                                    onDelete={() => handleDeleteReport(reportId)}
                                     isDeleting={deletingId === reportId}
                                 >
                                     <div className="space-y-2">
+                                        
                                         <p className="text-sm text-gray-600">{report.description || 'No description provided.'}</p>
                                         <div className="grid grid-cols-2 gap-4 text-sm">
                                             <div>
@@ -263,20 +203,6 @@ function ReportPage() {
                 </Button>
             </div>
 
-            <EditReportModal
-                isOpen={!!editingReport}
-                report={editingReport}
-                onClose={() => setEditingReport(null)}
-                onSave={handleSaveEdit}
-                loading={saving}
-            />
-
-            <DeleteReportModal
-                isOpen={!!reportToDelete}
-                onClose={() => setReportToDelete(null)}
-                onConfirm={handleConfirmDelete}
-                loading={!!deletingId}
-            />
         </>
     )
 }
