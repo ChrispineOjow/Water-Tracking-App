@@ -1,25 +1,28 @@
 import express from "express";
-import{
-    createReport, 
-    getAllReports, 
-    getReportById, 
-    updateReport, 
-    deleteReport} from "../controllers/Report.controller.js";
+import {
+    createReport,
+    getAllReports,
+    getReportById,
+    updateReport,
+    deleteReport
+} from "../controllers/Report.controller.js";
 import { requireAuth } from "@clerk/express";
 import { syncClerkUser } from "../middleware/clerk.middleware.js";
-import { 
-    validateReport, 
-    validateMongoId, 
-    handleValidation } from '../middleware/validate.middleware.js';
+import {
+    validateReport,
+    validateUpdateReport,
+    validateMongoId,
+    handleValidation
+} from '../middleware/validate.middleware.js';
 
 const reportRouter = express.Router();
 
 //Create a new water report and get all the reports
 reportRouter.route("/reports")
     .post(
-        requireAuth(), 
-        syncClerkUser, 
-        validateReport,                             
+        requireAuth(),
+        syncClerkUser,
+        validateReport,
         handleValidation,
         createReport)
     .get(getAllReports);
@@ -34,7 +37,7 @@ reportRouter.route("/reports/:_id")
         requireAuth(),
         syncClerkUser,
         validateMongoId,
-        validateReport,
+        validateUpdateReport,
         handleValidation,
         updateReport)//Update the Water report
     .delete(
